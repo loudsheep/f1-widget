@@ -118,6 +118,43 @@ private func loadSchedule() throws -> [RaceWeekend] {
     }
 }
 
+@Suite struct SessionDayTests {
+    private var utc: Calendar {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = .gmt
+        return calendar
+    }
+
+    @Test func groupsStandardWeekendIntoThreeDays() throws {
+        let australia = try #require(try loadSchedule().first { $0.circuit.id == "albert_park" })
+        let days = australia.sessionsByDay(calendar: utc)
+        #expect(days.map { $0.sessions.map(\.kind) } == [
+            [.firstPractice, .secondPractice],
+            [.thirdPractice, .qualifying],
+            [.race],
+        ])
+    }
+
+    @Test func groupsSprintWeekendIntoThreeDays() throws {
+        let china = try #require(try loadSchedule().first { $0.circuit.id == "shanghai" })
+        let days = china.sessionsByDay(calendar: utc)
+        #expect(days.count == 3)
+        #expect(days.last?.sessions.map(\.kind) == [.race])
+    }
+}
+
+@Suite struct GrandPrixCodeTests {
+    @Test func usesRacingAbbreviations() {
+        #expect(CountryFlag.grandPrixCode(for: "Azerbaijan") == "AZE")
+        #expect(CountryFlag.grandPrixCode(for: "Netherlands") == "NED")
+        #expect(CountryFlag.grandPrixCode(for: "Singapore") == "SIN")
+    }
+
+    @Test func fallsBackToFirstThreeLetters() {
+        #expect(CountryFlag.grandPrixCode(for: "Atlantis") == "ATL")
+    }
+}
+
 @Suite struct CountryThemeTests {
     @Test func accentIsReadableOnBlack() throws {
         for weekend in try loadSchedule() {

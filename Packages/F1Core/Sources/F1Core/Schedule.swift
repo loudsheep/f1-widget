@@ -20,3 +20,18 @@ public extension RaceWeekend {
         sessions.first { $0.end > date }
     }
 }
+
+public struct SessionDay: Identifiable, Hashable, Sendable {
+    public let day: Date
+    public let sessions: [WeekendSession]
+
+    public var id: Date { day }
+}
+
+public extension RaceWeekend {
+    func sessionsByDay(calendar: Calendar = .current) -> [SessionDay] {
+        Dictionary(grouping: sessions) { calendar.startOfDay(for: $0.start) }
+            .map { SessionDay(day: $0.key, sessions: $0.value.sorted { $0.start < $1.start }) }
+            .sorted { $0.day < $1.day }
+    }
+}

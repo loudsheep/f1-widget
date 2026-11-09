@@ -6,6 +6,10 @@ public enum CountryFlag {
         isoCodes[country]
     }
 
+    public static func grandPrixCode(for country: String) -> String {
+        gpCodes[country] ?? String(country.prefix(3)).uppercased()
+    }
+
     public static func url(for country: String) -> URL? {
         guard let code = isoCode(for: country) else { return nil }
         return Bundle.module.url(forResource: code.lowercased(), withExtension: "svg", subdirectory: "Flags")
@@ -15,6 +19,44 @@ public enum CountryFlag {
         guard let url = url(for: country) else { return nil }
         return NSImage(contentsOf: url)
     }
+
+    private static let gpCodes: [String: String] = [
+        "Argentina": "ARG",
+        "Australia": "AUS",
+        "Austria": "AUT",
+        "Azerbaijan": "AZE",
+        "Bahrain": "BHR",
+        "Belgium": "BEL",
+        "Brazil": "BRA",
+        "Canada": "CAN",
+        "China": "CHN",
+        "France": "FRA",
+        "Germany": "GER",
+        "Hungary": "HUN",
+        "India": "IND",
+        "Italy": "ITA",
+        "Japan": "JPN",
+        "Korea": "KOR",
+        "Malaysia": "MAS",
+        "Mexico": "MEX",
+        "Monaco": "MON",
+        "Morocco": "MAR",
+        "Netherlands": "NED",
+        "Portugal": "POR",
+        "Qatar": "QAT",
+        "Russia": "RUS",
+        "Saudi Arabia": "KSA",
+        "Singapore": "SIN",
+        "South Korea": "KOR",
+        "Spain": "ESP",
+        "Sweden": "SWE",
+        "Switzerland": "SUI",
+        "Turkey": "TUR",
+        "UAE": "UAE",
+        "UK": "GBR",
+        "USA": "USA",
+        "Vietnam": "VIE",
+    ]
 
     private static let isoCodes: [String: String] = [
         "Argentina": "AR",

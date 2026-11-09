@@ -127,45 +127,106 @@ private struct SmallTrackView: View {
     }
 }
 
+private struct CompactCountdown: View {
+    let content: WidgetContent
+
+    var body: some View {
+        let isLive = content.session.isLive(at: content.now)
+        Text(isLive ? "Live" : Countdown.text(until: content.session.start, from: content.now))
+            .font(.caption.bold())
+            .foregroundStyle(content.accent)
+            .minimumScaleFactor(0.7)
+            .lineLimit(1)
+    }
+}
+
 private struct MediumView: View {
     let content: WidgetContent
 
     var body: some View {
-        HStack(alignment: .top, spacing: 12) {
-            VStack(alignment: .leading, spacing: 6) {
-                CircuitMapView(circuitId: content.weekend.circuit.id)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                NextIn(content: content)
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
-
-            VStack(alignment: .leading, spacing: 3) {
-                HStack(alignment: .top, spacing: 6) {
-                    FlagView(country: content.weekend.circuit.country, width: 22)
-                    Text(content.weekend.name)
-                        .font(.caption.bold())
-                        .foregroundStyle(.white)
-                        .lineLimit(2)
-                        .minimumScaleFactor(0.8)
-                    Spacer(minLength: 0)
-                    RoundLabel(round: content.weekend.round)
-                }
-                .padding(.bottom, 2)
-                ForEach(content.weekend.sessions) { item in
-                    let isNext = item.kind == content.session.kind
-                    HStack {
-                        Text(item.kind.shortTitle)
-                        Spacer()
-                        Text(item.start, format: .dateTime.weekday(.abbreviated).hour().minute())
-                            .monospacedDigit()
-                    }
-                    .font(.caption2)
-                    .fontWeight(isNext ? .bold : .regular)
-                    .foregroundStyle(isNext ? content.accent : .white.opacity(0.7))
-                }
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
+        HStack(alignment: .top, spacing: 10) {
+            leading
+                .frame(maxWidth: .infinity, alignment: .leading)
+            sessionCards
+                .frame(maxWidth: .infinity)
         }
+    }
+
+    private var leading: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            HStack(alignment: .top) {
+                VStack(alignment: .leading, spacing: 0) {
+                    Text("\(CountryFlag.grandPrixCode(for: content.weekend.circuit.country)) GP")
+                        .font(.headline.bold())
+                        .foregroundStyle(.white)
+                    Text(content.weekend.circuit.locality)
+                        .font(.caption2)
+                        .foregroundStyle(.white.opacity(0.7))
+                        .lineLimit(1)
+                }
+                Spacer(minLength: 0)
+                FlagView(country: content.weekend.circuit.country, width: 36)
+            }
+            CircuitMapView(circuitId: content.weekend.circuit.id)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .padding(.vertical, 2)
+            HStack {
+                Text("R\(content.weekend.round)")
+                    .font(.subheadline.bold().monospacedDigit())
+                    .foregroundStyle(.white)
+                Spacer(minLength: 0)
+                CompactCountdown(content: content)
+            }
+        }
+    }
+
+    private var sessionCards: some View {
+        VStack(spacing: 4) {
+            ForEach(content.weekend.sessionsByDay()) { day in
+                DayCard(day: day, content: content)
+            }
+        }
+    }
+}
+
+private struct DayCard: View {
+    let day: SessionDay
+    let content: WidgetContent
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 2) {
+            ForEach(day.sessions) { session in
+                row(for: session)
+            }
+            Text(day.day, format: .dateTime.month(.abbreviated).day().weekday(.abbreviated))
+                .font(.system(size: 9))
+                .foregroundStyle(.white.opacity(0.5))
+                .padding(.leading, 8)
+        }
+        .padding(.horizontal, 7)
+        .padding(.vertical, 5)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(.white.opacity(0.1), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+    }
+
+    private func row(for session: WeekendSession) -> some View {
+        let isCurrent = session.kind == content.session.kind
+        let isOver = session.end <= content.now
+        return HStack(spacing: 4) {
+            Capsule()
+                .fill(content.accent)
+                .frame(width: 3, height: 11)
+            Text(session.kind.title)
+                .font(.caption2.weight(.semibold))
+                .lineLimit(1)
+                .minimumScaleFactor(0.7)
+            Spacer(minLength: 2)
+            Text(session.start, format: .dateTime.hour().minute())
+                .font(.caption2.monospacedDigit())
+                .foregroundStyle(isCurrent ? content.accent : .white.opacity(0.7))
+        }
+        .foregroundStyle(.white)
+        .opacity(isOver ? 0.4 : 1)
     }
 }
 

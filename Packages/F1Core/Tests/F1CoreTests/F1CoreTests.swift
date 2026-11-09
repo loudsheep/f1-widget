@@ -51,12 +51,29 @@ private func loadSchedule() throws -> [RaceWeekend] {
         #expect(next.session.kind == .firstPractice)
     }
 
-    @Test func advancesAtSessionBoundary() throws {
+    @Test func staysOnSessionWhileLive() throws {
         let schedule = try loadSchedule()
         let first = try #require(schedule.first)
-        let secondSession = first.sessions[1]
-        let next = try #require(schedule.nextSession(at: first.sessions[0].start))
-        #expect(next.session == secondSession)
+        let current = first.sessions[0]
+        let during = current.start.addingTimeInterval(30 * 60)
+        let next = try #require(schedule.nextSession(at: during))
+        #expect(next.session == current)
+        #expect(current.isLive(at: during))
+    }
+
+    @Test func advancesWhenSessionEnds() throws {
+        let schedule = try loadSchedule()
+        let first = try #require(schedule.first)
+        let next = try #require(schedule.nextSession(at: first.sessions[0].end))
+        #expect(next.session == first.sessions[1])
+        #expect(!first.sessions[0].isLive(at: first.sessions[0].end))
+    }
+
+    @Test func raceLastsTwoHoursAndOthersOne() {
+        #expect(SessionKind.race.duration == 2 * 3600)
+        for kind in SessionKind.allCases where kind != .race {
+            #expect(kind.duration == 3600)
+        }
     }
 
     @Test func returnsNilAfterSeasonEnds() throws {

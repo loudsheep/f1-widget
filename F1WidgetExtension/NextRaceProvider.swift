@@ -36,10 +36,10 @@ struct NextRaceProvider: AppIntentTimelineProvider {
 
         let end = now.addingTimeInterval(Self.horizon)
         var dates = Array(stride(from: now, to: end, by: Self.step))
-        if let next = schedule.nextSession(at: now), next.session.start < end {
-            dates.removeAll { $0 >= next.session.start }
-            dates.append(next.session.start)
+        if let session = schedule.nextSession(at: now)?.session {
+            dates += [session.start, session.end].filter { $0 > now && $0 < end }
         }
+        dates = Array(Set(dates)).sorted()
 
         let entries = dates.map { Self.entry(at: $0, schedule: schedule, style: configuration.style) }
         return Timeline(entries: entries, policy: .after(dates.last ?? end))

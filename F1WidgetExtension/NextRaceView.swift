@@ -50,12 +50,16 @@ private struct RoundLabel: View {
 private struct NextIn: View {
     let content: WidgetContent
 
+    private var isLive: Bool {
+        content.session.isLive(at: content.now)
+    }
+
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            Text("Next in:")
+            Text(isLive ? "Now:" : "Next in:")
                 .font(.caption2)
                 .foregroundStyle(.white.opacity(0.7))
-            Text(Countdown.text(until: content.session.start, from: content.now))
+            Text(isLive ? "Live" : Countdown.text(until: content.session.start, from: content.now))
                 .font(.title3.bold())
                 .foregroundStyle(content.accent)
                 .minimumScaleFactor(0.7)

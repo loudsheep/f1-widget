@@ -7,7 +7,7 @@ public extension Collection where Element == RaceWeekend {
 
     func nextSession(at date: Date) -> (weekend: RaceWeekend, session: WeekendSession)? {
         for weekend in sorted(by: { $0.round < $1.round }) {
-            if let session = weekend.sessions.first(where: { $0.start > date }) {
+            if let session = weekend.sessions.first(where: { $0.end > date }) {
                 return (weekend, session)
             }
         }
@@ -17,6 +17,6 @@ public extension Collection where Element == RaceWeekend {
 
 public extension RaceWeekend {
     func nextSession(at date: Date) -> WeekendSession? {
-        sessions.first { $0.start > date }
+        sessions.first { $0.end > date }
     }
 }

@@ -35,6 +35,10 @@ public enum SessionKind: String, Codable, CaseIterable, Sendable {
         }
     }
 
+    public var duration: TimeInterval {
+        self == .race ? 2 * 60 * 60 : 60 * 60
+    }
+
     public var shortTitle: String {
         switch self {
         case .firstPractice: "FP1"
@@ -54,6 +58,12 @@ public struct WeekendSession: Codable, Hashable, Sendable, Identifiable {
 
     public var id: SessionKind { kind }
 
+    public var end: Date { start.addingTimeInterval(kind.duration) }
+
+    public func isLive(at date: Date) -> Bool {
+        start <= date && date < end
+    }
+
     public init(kind: SessionKind, start: Date) {
         self.kind = kind
         self.start = start
@@ -61,8 +71,6 @@ public struct WeekendSession: Codable, Hashable, Sendable, Identifiable {
 }
 
 public struct RaceWeekend: Codable, Hashable, Sendable, Identifiable {
-    public static let assumedRaceDuration: TimeInterval = 2 * 60 * 60
-
     public let season: Int
     public let round: Int
     public let name: String
@@ -80,7 +88,7 @@ public struct RaceWeekend: Codable, Hashable, Sendable, Identifiable {
     }
 
     public var finish: Date? {
-        raceStart?.addingTimeInterval(Self.assumedRaceDuration)
+        sessions.first { $0.kind == .race }?.end
     }
 
     public init(season: Int, round: Int, name: String, circuit: Circuit, sessions: [WeekendSession]) {

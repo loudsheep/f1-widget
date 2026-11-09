@@ -43,6 +43,16 @@ public struct RGB: Hashable, Sendable {
         )
     }
 
+    public func darkened(toLuminance limit: Double) -> RGB {
+        var amount = 0.0
+        var color = self
+        while color.relativeLuminance > limit, amount < 1 {
+            amount += 0.05
+            color = mixed(with: .black, amount: amount)
+        }
+        return color
+    }
+
     public func vivid() -> RGB {
         let brightest = max(red, green, blue)
         guard brightest > 0 else { return self }
@@ -63,12 +73,18 @@ public struct RGB: Hashable, Sendable {
 
 public struct CountryTheme: Sendable {
     public static let minimumTextContrast = 10.0
+    public static let maximumGlowLuminance = 0.25
     public static let fallback = CountryTheme(colors: [RGB(hex: 0xE10600)])
 
     public let colors: [RGB]
 
-    public var glowPrimary: RGB { colors[0] }
-    public var glowSecondary: RGB { colors.count > 1 ? colors[1] : colors[0] }
+    public var glowPrimary: RGB { glowColors[0] }
+    public var glowSecondary: RGB { glowColors.count > 1 ? glowColors[1] : glowColors[0] }
+
+    private var glowColors: [RGB] {
+        let dark = colors.filter { $0.relativeLuminance <= Self.maximumGlowLuminance }
+        return dark.isEmpty ? [colors[0].darkened(toLuminance: Self.maximumGlowLuminance)] : dark
+    }
 
     public var accent: RGB {
         glowPrimary.vivid().lightened(toContrast: Self.minimumTextContrast)

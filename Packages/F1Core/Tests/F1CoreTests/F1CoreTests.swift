@@ -164,6 +164,18 @@ private func loadSchedule() throws -> [RaceWeekend] {
         }
     }
 
+    @Test func glowIsDarkEnoughForWhiteText() throws {
+        for weekend in try loadSchedule() {
+            let theme = CountryTheme.theme(for: weekend.circuit.country)
+            for glow in [theme.glowPrimary, theme.glowSecondary] {
+                #expect(
+                    glow.relativeLuminance <= CountryTheme.maximumGlowLuminance,
+                    "\(weekend.circuit.country): \(glow.relativeLuminance)"
+                )
+            }
+        }
+    }
+
     @Test func lighteningNeverChangesAlreadyReadableColors() {
         let color = RGB(hex: 0xFAE042)
         #expect(color.lightened(toContrast: 4.5) == color)

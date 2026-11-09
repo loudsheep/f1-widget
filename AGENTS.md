@@ -9,6 +9,7 @@ macOS app plus WidgetKit extension showing the next Formula 1 session. See `READ
 - `Packages/F1Core/`: local Swift package shared by both targets. All logic that can be tested without UI lives here.
 - `Config/`: `Shared.xcconfig` (bundle ID prefix, deployment target), entitlements, widget Info.plist.
 - `Scripts/generate_circuit_maps.py`: builds circuit SVGs from the f1-circuits repo.
+- `Scripts/generate_app_icon.swift`: draws the app icon into the AppIcon asset set (`swift Scripts/generate_app_icon.swift`).
 
 ## Running tests
 
@@ -26,7 +27,7 @@ swift test --filter CountdownTests
 swift test --filter F1CoreTests.CountdownTests/formatsDaysHoursMinutes
 ```
 
-Tests run offline. They decode recorded API responses: the season lives in `Sources/F1Core/Resources/SampleData/season.json` (it is also used by the widget preview gallery) and the results in `Tests/F1CoreTests/Fixtures/results.json`. When a new season starts, refresh them:
+Tests run offline. They decode recorded API responses: the season lives in `Sources/F1Core/Resources/SampleData/season.json` (it is also used by the Widget Gallery in the app) and the results in `Tests/F1CoreTests/Fixtures/results.json`. When a new season starts, refresh them:
 
 ```
 curl -s "https://api.jolpi.ca/ergast/f1/current.json?limit=100" -o Packages/F1Core/Sources/F1Core/Resources/SampleData/season.json
@@ -53,7 +54,7 @@ xcodebuild -project F1Widget.xcodeproj -scheme F1Widget -configuration Debug COD
 
 Use a scratch `-derivedDataPath` to keep build output out of the repo.
 
-A real run (widget visible on the desktop) needs a signed build from Xcode: set the team on both targets, then run the `F1Widget` scheme. After changing widget code, `killall F1WidgetExtension` forces the desktop widget to reload. Design iteration is fastest with the `#Preview` blocks in `F1WidgetExtension/NextRaceView.swift`.
+A real run (widget visible on the desktop) needs a signed build from Xcode: set the team on both targets, then run the `F1Widget` scheme. After changing widget code, `killall F1WidgetExtension` forces the desktop widget to reload. Design iteration is fastest with the Widget Gallery described above.
 
 ## Adding a circuit
 
@@ -65,7 +66,7 @@ A missing circuit map is not an error at runtime. The widget falls back to the l
 
 ## Adding a country
 
-A new host country needs three things in `Packages/F1Core`: an ISO code in `CountryFlag.isoCodes`, a flag SVG in `Resources/Flags/<iso lowercase>.svg` (from flag-icons, 4x3), and a palette in `CountryTheme.palettes`. The first palette color drives the widget accent text and is lightened automatically to keep a 4.5 contrast ratio on black. `everyCountryInFixtureHasFlagAndTheme` fails until all three exist.
+A new host country needs three things in `Packages/F1Core`: an ISO code in `CountryFlag.isoCodes`, a flag SVG in `Resources/Flags/<iso lowercase>.svg` (from flag-icons, 4x3), and a palette in `CountryTheme.palettes`. The first palette color drives the widget accent text and is brightened automatically to keep a 10:1 contrast ratio on black. The glow only uses palette colors dark enough for white text (`CountryTheme.maximumGlowLuminance`), so white and light yellow are ignored there. `everyCountryInFixtureHasFlagAndTheme` fails until all three exist.
 
 ## Constraints
 

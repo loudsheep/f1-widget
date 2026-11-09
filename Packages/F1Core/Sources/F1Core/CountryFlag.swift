@@ -1,5 +1,6 @@
 import AppKit
 import SwiftUI
+import WidgetKit
 
 public enum CountryFlag {
     public static func isoCode(for country: String) -> String? {
@@ -111,6 +112,7 @@ public struct FlagView: View {
             if let image = CountryFlag.image(for: country) {
                 Image(nsImage: image)
                     .resizable()
+                    .widgetAccentedRenderingMode(.fullColor)
                     .aspectRatio(4 / 3, contentMode: .fit)
             } else {
                 Image(systemName: "flag.fill")

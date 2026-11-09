@@ -10,6 +10,28 @@ Data comes from [Jolpica F1](https://api.jolpi.ca/ergast/), the successor to the
 - **Widget (medium):** track outline, race name, all session times, countdown, and flag.
 - **App:** season calendar and results for completed races.
 
+## Screenshots
+
+### Accent colors
+
+<p>
+  <img src="docs/screenshots/small_color_flag.png" alt="Small widget with flag" width="166">
+  <img src="docs/screenshots/small_color_track.png" alt="Small widget with track outline" width="166">
+</p>
+<p>
+  <img src="docs/screenshots/medium_color.png" alt="Medium widget" width="352">
+</p>
+
+### Black and white
+
+<p>
+  <img src="docs/screenshots/small_bw_flag.png" alt="Small widget with flag, black and white" width="166">
+  <img src="docs/screenshots/small_bw_track.png" alt="Small widget with track outline, black and white" width="166">
+</p>
+<p>
+  <img src="docs/screenshots/medium_bw.png" alt="Medium widget, black and white" width="352">
+</p>
+
 ## Requirements
 
 - macOS 27 or later

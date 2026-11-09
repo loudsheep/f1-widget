@@ -6,6 +6,7 @@ struct NextRaceEntry: TimelineEntry {
     let weekend: RaceWeekend?
     let session: WeekendSession?
     let style: WidgetStyle
+    let appearance: WidgetAppearance
 }
 
 struct NextRaceProvider: AppIntentTimelineProvider {
@@ -15,21 +16,29 @@ struct NextRaceProvider: AppIntentTimelineProvider {
     private let repository = F1Repository()
 
     func placeholder(in context: Context) -> NextRaceEntry {
-        Self.sampleEntry(style: .flag)
+        Self.sampleEntry(style: .flag, appearance: .accent)
     }
 
     func snapshot(for configuration: NextRaceIntent, in context: Context) async -> NextRaceEntry {
         guard !context.isPreview, let schedule = try? await repository.schedule() else {
-            return Self.sampleEntry(style: configuration.style)
+            return Self.sampleEntry(style: configuration.style, appearance: configuration.appearance)
         }
-        return Self.entry(at: .now, schedule: schedule, style: configuration.style)
+        return Self.entry(at: .now, schedule: schedule, configuration: configuration)
     }
 
     func timeline(for configuration: NextRaceIntent, in context: Context) async -> Timeline<NextRaceEntry> {
         let now = Date.now
         guard let schedule = try? await repository.schedule() else {
             return Timeline(
-                entries: [NextRaceEntry(date: now, weekend: nil, session: nil, style: configuration.style)],
+                entries: [
+                    NextRaceEntry(
+                        date: now,
+                        weekend: nil,
+                        session: nil,
+                        style: configuration.style,
+                        appearance: configuration.appearance
+                    ),
+                ],
                 policy: .after(now.addingTimeInterval(30 * 60))
             )
         }
@@ -41,16 +50,22 @@ struct NextRaceProvider: AppIntentTimelineProvider {
         }
         dates = Array(Set(dates)).sorted()
 
-        let entries = dates.map { Self.entry(at: $0, schedule: schedule, style: configuration.style) }
+        let entries = dates.map { Self.entry(at: $0, schedule: schedule, configuration: configuration) }
         return Timeline(entries: entries, policy: .after(dates.last ?? end))
     }
 
-    private static func entry(at date: Date, schedule: [RaceWeekend], style: WidgetStyle) -> NextRaceEntry {
+    private static func entry(at date: Date, schedule: [RaceWeekend], configuration: NextRaceIntent) -> NextRaceEntry {
         let next = schedule.nextSession(at: date)
-        return NextRaceEntry(date: date, weekend: next?.weekend, session: next?.session, style: style)
+        return NextRaceEntry(
+            date: date,
+            weekend: next?.weekend,
+            session: next?.session,
+            style: configuration.style,
+            appearance: configuration.appearance
+        )
     }
 
-    static func sampleEntry(style: WidgetStyle) -> NextRaceEntry {
+    static func sampleEntry(style: WidgetStyle, appearance: WidgetAppearance = .accent) -> NextRaceEntry {
         let start = Date.now.addingTimeInterval(3 * 3600 + 25 * 60)
         let weekend = RaceWeekend(
             season: 2026,
@@ -65,6 +80,6 @@ struct NextRaceProvider: AppIntentTimelineProvider {
                 WeekendSession(kind: .race, start: start.addingTimeInterval(48 * 3600)),
             ]
         )
-        return NextRaceEntry(date: .now, weekend: weekend, session: weekend.sessions.first, style: style)
+        return NextRaceEntry(date: .now, weekend: weekend, session: weekend.sessions.first, style: style, appearance: appearance)
     }
 }

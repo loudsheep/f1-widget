@@ -10,7 +10,7 @@ struct NextRaceWidget: Widget {
             NextRaceView(entry: entry)
                 .environment(\.colorScheme, .dark)
                 .containerBackground(for: .widget) {
-                    WidgetBackground(theme: entry.theme)
+                    WidgetBackground(theme: entry.theme, appearance: entry.appearance)
                 }
         }
         .configurationDisplayName("Next Race")
@@ -21,10 +21,19 @@ struct NextRaceWidget: Widget {
 
 struct WidgetBackground: View {
     let theme: CountryTheme
+    let appearance: WidgetAppearance
 
     var body: some View {
         ZStack {
             Color.black
+            if appearance == .accent {
+                glow
+            }
+        }
+    }
+
+    private var glow: some View {
+        ZStack {
             RadialGradient(
                 colors: [theme.glowPrimary.color.opacity(0.75), .clear],
                 center: .topLeading,

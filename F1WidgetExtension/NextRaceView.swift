@@ -8,7 +8,7 @@ struct NextRaceView: View {
 
     var body: some View {
         if let weekend = entry.weekend, let session = entry.session {
-            let content = WidgetContent(weekend: weekend, session: session, now: entry.date)
+            let content = WidgetContent(weekend: weekend, session: session, now: entry.date, appearance: entry.appearance)
             Group {
                 switch family {
                 case .systemSmall:
@@ -32,9 +32,14 @@ private struct WidgetContent {
     let weekend: RaceWeekend
     let session: WeekendSession
     let now: Date
+    let appearance: WidgetAppearance
 
-    var theme: CountryTheme { CountryTheme.theme(for: weekend.circuit.country) }
-    var accent: Color { theme.accent.color }
+    var accent: Color {
+        switch appearance {
+        case .accent: CountryTheme.theme(for: weekend.circuit.country).accent.color
+        case .monochrome: .white
+        }
+    }
 }
 
 private struct RoundLabel: View {
@@ -241,4 +246,5 @@ private struct DayCard: View {
     NextRaceWidget()
 } timeline: {
     NextRaceProvider.sampleEntry(style: .flag)
+    NextRaceProvider.sampleEntry(style: .flag, appearance: .monochrome)
 }

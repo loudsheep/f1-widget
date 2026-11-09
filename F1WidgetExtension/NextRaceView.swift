@@ -7,15 +7,6 @@ struct NextRaceView: View {
     let entry: NextRaceEntry
 
     var body: some View {
-        NextRaceContent(entry: entry, family: family)
-    }
-}
-
-struct NextRaceContent: View {
-    let entry: NextRaceEntry
-    let family: WidgetFamily
-
-    var body: some View {
         if let weekend = entry.weekend, let session = entry.session {
             let content = WidgetContent(weekend: weekend, session: session, now: entry.date, appearance: entry.appearance)
             Group {

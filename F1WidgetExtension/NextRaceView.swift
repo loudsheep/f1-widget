@@ -8,15 +8,16 @@ struct NextRaceView: View {
 
     var body: some View {
         if let weekend = entry.weekend, let session = entry.session {
+            let content = WidgetContent(weekend: weekend, session: session, now: entry.date)
             switch family {
             case .systemSmall:
                 if entry.style == .track, CircuitMap.url(for: weekend.circuit.id) != nil {
-                    SmallTrackView(weekend: weekend, session: session, now: entry.date)
+                    SmallTrackView(content: content)
                 } else {
-                    SmallFlagView(weekend: weekend, session: session, now: entry.date)
+                    SmallFlagView(content: content)
                 }
             default:
-                MediumView(weekend: weekend, session: session, now: entry.date)
+                MediumView(content: content)
             }
         } else {
             ContentUnavailableView("No upcoming race", systemImage: "flag.checkered")
@@ -24,22 +25,41 @@ struct NextRaceView: View {
     }
 }
 
-private struct NextIn: View {
+private struct WidgetContent {
+    let weekend: RaceWeekend
     let session: WeekendSession
     let now: Date
+
+    var theme: CountryTheme { CountryTheme.theme(for: weekend.circuit.country) }
+    var accent: Color { theme.accent.color }
+}
+
+private struct RoundLabel: View {
+    let round: Int
+
+    var body: some View {
+        Text("R\(round)")
+            .font(.caption2.bold().monospacedDigit())
+            .foregroundStyle(.white.opacity(0.7))
+    }
+}
+
+private struct NextIn: View {
+    let content: WidgetContent
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             Text("Next in:")
                 .font(.caption2)
-                .foregroundStyle(.secondary)
-            Text(Countdown.text(until: session.start, from: now))
+                .foregroundStyle(.white.opacity(0.7))
+            Text(Countdown.text(until: content.session.start, from: content.now))
                 .font(.title3.bold())
+                .foregroundStyle(content.accent)
                 .minimumScaleFactor(0.7)
                 .lineLimit(1)
-            Text(session.kind.title)
+            Text(content.session.kind.title)
                 .font(.caption2)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(.white.opacity(0.7))
         }
     }
 }
@@ -53,24 +73,26 @@ private struct CircuitMapView: View {
                 .resizable()
                 .renderingMode(.template)
                 .scaledToFit()
-                .foregroundStyle(.primary)
+                .foregroundStyle(.white)
         }
     }
 }
 
 private struct SmallFlagView: View {
-    let weekend: RaceWeekend
-    let session: WeekendSession
-    let now: Date
+    let content: WidgetContent
 
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
-            Text(CountryFlag.emoji(for: weekend.circuit.country))
-                .font(.system(size: 40))
+            HStack(alignment: .top) {
+                FlagView(country: content.weekend.circuit.country, width: 48)
+                Spacer()
+                RoundLabel(round: content.weekend.round)
+            }
             Spacer(minLength: 0)
-            NextIn(session: session, now: now)
-            Text(weekend.name)
+            NextIn(content: content)
+            Text(content.weekend.name)
                 .font(.caption.bold())
+                .foregroundStyle(.white)
                 .lineLimit(2)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -78,46 +100,51 @@ private struct SmallFlagView: View {
 }
 
 private struct SmallTrackView: View {
-    let weekend: RaceWeekend
-    let session: WeekendSession
-    let now: Date
+    let content: WidgetContent
 
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
-            CircuitMapView(circuitId: weekend.circuit.id)
-                .frame(maxWidth: .infinity, maxHeight: 60)
+            ZStack(alignment: .topTrailing) {
+                CircuitMapView(circuitId: content.weekend.circuit.id)
+                    .frame(maxWidth: .infinity, maxHeight: 60)
+                RoundLabel(round: content.weekend.round)
+            }
             Spacer(minLength: 0)
-            Text(weekend.name)
+            Text(content.weekend.name)
                 .font(.caption.bold())
+                .foregroundStyle(.white)
                 .lineLimit(2)
-            NextIn(session: session, now: now)
+            NextIn(content: content)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
     }
 }
 
 private struct MediumView: View {
-    let weekend: RaceWeekend
-    let session: WeekendSession
-    let now: Date
+    let content: WidgetContent
 
     var body: some View {
         HStack(alignment: .top, spacing: 12) {
             VStack(alignment: .leading, spacing: 6) {
-                CircuitMapView(circuitId: weekend.circuit.id)
+                CircuitMapView(circuitId: content.weekend.circuit.id)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
-                NextIn(session: session, now: now)
+                NextIn(content: content)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
 
             VStack(alignment: .leading, spacing: 3) {
-                HStack(spacing: 4) {
-                    Text(CountryFlag.emoji(for: weekend.circuit.country))
-                    Text(weekend.name)
+                HStack(spacing: 6) {
+                    FlagView(country: content.weekend.circuit.country, width: 22)
+                    Text(content.weekend.name)
                         .font(.caption.bold())
+                        .foregroundStyle(.white)
                         .lineLimit(1)
+                    Spacer(minLength: 0)
+                    RoundLabel(round: content.weekend.round)
                 }
-                ForEach(weekend.sessions) { item in
+                .padding(.bottom, 2)
+                ForEach(content.weekend.sessions) { item in
+                    let isNext = item.kind == content.session.kind
                     HStack {
                         Text(item.kind.shortTitle)
                         Spacer()
@@ -125,8 +152,8 @@ private struct MediumView: View {
                             .monospacedDigit()
                     }
                     .font(.caption2)
-                    .foregroundStyle(item.kind == session.kind ? .primary : .secondary)
-                    .fontWeight(item.kind == session.kind ? .bold : .regular)
+                    .fontWeight(isNext ? .bold : .regular)
+                    .foregroundStyle(isNext ? content.accent : .white.opacity(0.7))
                 }
             }
             .frame(maxWidth: .infinity, alignment: .leading)

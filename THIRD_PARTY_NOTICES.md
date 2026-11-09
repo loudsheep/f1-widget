@@ -28,6 +28,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
 
+## flag-icons
+
+The flag SVGs in `Packages/F1Core/Sources/F1Core/Resources/Flags/` come from [flag-icons](https://github.com/lipis/flag-icons) 7.2.3 (4x3 set), licensed under the MIT License, Copyright (c) 2013 Panayiotis Lipiridis.
+
 ## Jolpica F1 API
 
 Schedule and results data come from [Jolpica F1](https://api.jolpi.ca/ergast/), the successor to the Ergast API.

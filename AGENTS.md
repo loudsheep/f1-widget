@@ -57,6 +57,10 @@ A real run (widget visible on the desktop) needs a signed build from Xcode: set 
 
 A missing circuit map is not an error at runtime. The widget falls back to the layout without a map.
 
+## Adding a country
+
+A new host country needs three things in `Packages/F1Core`: an ISO code in `CountryFlag.isoCodes`, a flag SVG in `Resources/Flags/<iso lowercase>.svg` (from flag-icons, 4x3), and a palette in `CountryTheme.palettes`. The first palette color drives the widget accent text and is lightened automatically to keep a 4.5 contrast ratio on black. `everyCountryInFixtureHasFlagAndTheme` fails until all three exist.
+
 ## Constraints
 
 - The App Group ID `group.dev.loudsheep.f1widget` is duplicated in `Config/*.entitlements` and `AppGroup.identifier` in `DiskCache.swift`. Change all three together.

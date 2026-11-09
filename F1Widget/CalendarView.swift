@@ -23,8 +23,7 @@ private struct WeekendRow: View {
 
     var body: some View {
         HStack(spacing: 12) {
-            Text(CountryFlag.emoji(for: weekend.circuit.country))
-                .font(.largeTitle)
+            FlagView(country: weekend.circuit.country, width: 40)
             VStack(alignment: .leading, spacing: 2) {
                 Text("Round \(weekend.round)")
                     .font(.caption)

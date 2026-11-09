@@ -1,14 +1,19 @@
-import Foundation
+import AppKit
+import SwiftUI
 
 public enum CountryFlag {
-    public static let fallback = "🌐"
+    public static func isoCode(for country: String) -> String? {
+        isoCodes[country]
+    }
 
-    public static func emoji(for country: String) -> String {
-        guard let code = isoCodes[country] else { return fallback }
-        return code.unicodeScalars
-            .compactMap { Unicode.Scalar(0x1F1E6 + $0.value - 65) }
-            .map { String($0) }
-            .joined()
+    public static func url(for country: String) -> URL? {
+        guard let code = isoCode(for: country) else { return nil }
+        return Bundle.module.url(forResource: code.lowercased(), withExtension: "svg", subdirectory: "Flags")
+    }
+
+    public static func image(for country: String) -> NSImage? {
+        guard let url = url(for: country) else { return nil }
+        return NSImage(contentsOf: url)
     }
 
     private static let isoCodes: [String: String] = [
@@ -48,4 +53,36 @@ public enum CountryFlag {
         "USA": "US",
         "Vietnam": "VN",
     ]
+}
+
+public struct FlagView: View {
+    private let country: String
+    private let width: CGFloat
+
+    public init(country: String, width: CGFloat) {
+        self.country = country
+        self.width = width
+    }
+
+    public var body: some View {
+        Group {
+            if let image = CountryFlag.image(for: country) {
+                Image(nsImage: image)
+                    .resizable()
+                    .aspectRatio(4 / 3, contentMode: .fit)
+            } else {
+                Image(systemName: "flag.fill")
+                    .resizable()
+                    .scaledToFit()
+                    .padding(width * 0.15)
+                    .foregroundStyle(.secondary)
+            }
+        }
+        .frame(width: width, height: width * 3 / 4)
+        .clipShape(RoundedRectangle(cornerRadius: width * 0.1, style: .continuous))
+        .overlay {
+            RoundedRectangle(cornerRadius: width * 0.1, style: .continuous)
+                .strokeBorder(.white.opacity(0.18), lineWidth: 0.5)
+        }
+    }
 }

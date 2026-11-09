@@ -10,7 +10,10 @@ let package = Package(
     targets: [
         .target(
             name: "F1Core",
-            resources: [.copy("Resources/CircuitMaps")]
+            resources: [
+                .copy("Resources/CircuitMaps"),
+                .copy("Resources/Flags"),
+            ]
         ),
         .testTarget(
             name: "F1CoreTests",

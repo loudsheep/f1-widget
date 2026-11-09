@@ -81,20 +81,43 @@ private func loadSchedule() throws -> [RaceWeekend] {
 }
 
 @Suite struct CountryFlagTests {
-    @Test func mapsKnownCountries() {
-        #expect(CountryFlag.emoji(for: "Australia") == "🇦🇺")
-        #expect(CountryFlag.emoji(for: "UK") == "🇬🇧")
-        #expect(CountryFlag.emoji(for: "USA") == "🇺🇸")
+    @Test func resolvesIsoCodes() {
+        #expect(CountryFlag.isoCode(for: "Australia") == "AU")
+        #expect(CountryFlag.isoCode(for: "UK") == "GB")
+        #expect(CountryFlag.isoCode(for: "USA") == "US")
+        #expect(CountryFlag.isoCode(for: "Atlantis") == nil)
     }
 
-    @Test func fallsBackForUnknownCountry() {
-        #expect(CountryFlag.emoji(for: "Atlantis") == CountryFlag.fallback)
+    @Test func unknownCountryHasNoImage() {
+        #expect(CountryFlag.image(for: "Atlantis") == nil)
     }
 
-    @Test func coversEveryCountryInFixture() throws {
+    @Test func everyCountryInFixtureHasFlagAndTheme() throws {
         for weekend in try loadSchedule() {
-            #expect(CountryFlag.emoji(for: weekend.circuit.country) != CountryFlag.fallback, "\(weekend.circuit.country)")
+            let country = weekend.circuit.country
+            #expect(CountryFlag.image(for: country) != nil, "flag: \(country)")
+            #expect(CountryTheme.hasTheme(for: country), "theme: \(country)")
         }
+    }
+}
+
+@Suite struct CountryThemeTests {
+    @Test func accentIsReadableOnBlack() throws {
+        for weekend in try loadSchedule() {
+            let theme = CountryTheme.theme(for: weekend.circuit.country)
+            let ratio = theme.accent.contrastRatio(with: .black)
+            #expect(ratio >= CountryTheme.minimumTextContrast, "\(weekend.circuit.country): \(ratio)")
+        }
+    }
+
+    @Test func lighteningNeverChangesAlreadyReadableColors() {
+        let color = RGB(hex: 0xFAE042)
+        #expect(color.lightened(toContrast: 4.5) == color)
+    }
+
+    @Test func contrastRatioMatchesWcagReferenceValues() {
+        #expect(abs(RGB.white.contrastRatio(with: .black) - 21) < 0.001)
+        #expect(abs(RGB.white.contrastRatio(with: .white) - 1) < 0.001)
     }
 }
 

@@ -21,7 +21,7 @@ struct NextRaceProvider: AppIntentTimelineProvider {
 
     func snapshot(for configuration: NextRaceIntent, in context: Context) async -> NextRaceEntry {
         guard !context.isPreview, let schedule = try? await repository.schedule() else {
-            return Self.sampleEntry(style: configuration.style, appearance: configuration.appearance)
+            return Self.sampleEntry(style: configuration.style.style, appearance: configuration.appearance.appearance)
         }
         return Self.entry(at: .now, schedule: schedule, configuration: configuration)
     }
@@ -35,8 +35,8 @@ struct NextRaceProvider: AppIntentTimelineProvider {
                         date: now,
                         weekend: nil,
                         session: nil,
-                        style: configuration.style,
-                        appearance: configuration.appearance
+                        style: configuration.style.style,
+                        appearance: configuration.appearance.appearance
                     ),
                 ],
                 policy: .after(now.addingTimeInterval(30 * 60))
@@ -60,8 +60,8 @@ struct NextRaceProvider: AppIntentTimelineProvider {
             date: date,
             weekend: next?.weekend,
             session: next?.session,
-            style: configuration.style,
-            appearance: configuration.appearance
+            style: configuration.style.style,
+            appearance: configuration.appearance.appearance
         )
     }
 

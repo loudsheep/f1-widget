@@ -37,6 +37,12 @@ Then update the expected counts in `F1CoreTests.swift` if the number of rounds c
 
 `everyCircuitInFixtureHasAMap` fails when a circuit in the season fixture has no bundled SVG. Fix it by adding the circuit (see below), not by loosening the test.
 
+## Widget UI
+
+The widget views live in `Packages/F1Core/Sources/F1Core/Widget/` (`NextRaceWidgetView`, `WidgetBackground`) and take plain values, so both the extension and the app can render them. The extension only maps timeline entries and the App Intent options onto them.
+
+Xcode cannot preview widgets on macOS (`#Preview(as:)` fails with "This platform does not support previewing widgets"). To check every race and state, run the `F1Widget` scheme in a Debug configuration and open "Widget Gallery" in the sidebar. It renders all 23 races from `SampleData` at real widget sizes, in both appearances.
+
 ## Building
 
 Command line builds need signing disabled, because the team is only configured in Xcode:

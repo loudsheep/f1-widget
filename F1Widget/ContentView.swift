@@ -3,6 +3,9 @@ import SwiftUI
 private enum Section: String, CaseIterable, Identifiable {
     case calendar = "Calendar"
     case results = "Results"
+    #if DEBUG
+    case gallery = "Widget Gallery"
+    #endif
 
     var id: Self { self }
 
@@ -10,6 +13,9 @@ private enum Section: String, CaseIterable, Identifiable {
         switch self {
         case .calendar: "calendar"
         case .results: "flag.checkered"
+        #if DEBUG
+        case .gallery: "square.grid.2x2"
+        #endif
         }
     }
 }
@@ -35,6 +41,9 @@ struct ContentView: View {
                 switch selection ?? .calendar {
                 case .calendar: CalendarView()
                 case .results: ResultsView()
+                #if DEBUG
+                case .gallery: WidgetGalleryView()
+                #endif
                 }
             }
         }

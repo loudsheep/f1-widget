@@ -62,7 +62,7 @@ public struct RGB: Hashable, Sendable {
 }
 
 public struct CountryTheme: Sendable {
-    public static let minimumTextContrast = 7.0
+    public static let minimumTextContrast = 10.0
     public static let fallback = CountryTheme(colors: [RGB(hex: 0xE10600)])
 
     public let colors: [RGB]

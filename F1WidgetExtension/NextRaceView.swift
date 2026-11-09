@@ -60,7 +60,7 @@ private struct NextIn: View {
                 .font(.caption2)
                 .foregroundStyle(.white.opacity(0.7))
             Text(isLive ? "Live" : Countdown.text(until: content.session.start, from: content.now))
-                .font(.title3.bold())
+                .font(.title3.weight(.heavy))
                 .foregroundStyle(content.accent)
                 .minimumScaleFactor(0.7)
                 .lineLimit(1)

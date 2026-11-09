@@ -26,10 +26,10 @@ swift test --filter CountdownTests
 swift test --filter F1CoreTests.CountdownTests/formatsDaysHoursMinutes
 ```
 
-Tests run offline. They decode recorded API responses from `Tests/F1CoreTests/Fixtures/` (`season.json`, `results.json`). When a new season starts, refresh the fixtures:
+Tests run offline. They decode recorded API responses: the season lives in `Sources/F1Core/Resources/SampleData/season.json` (it is also used by the widget preview gallery) and the results in `Tests/F1CoreTests/Fixtures/results.json`. When a new season starts, refresh them:
 
 ```
-curl -s "https://api.jolpi.ca/ergast/f1/current.json?limit=100" -o Packages/F1Core/Tests/F1CoreTests/Fixtures/season.json
+curl -s "https://api.jolpi.ca/ergast/f1/current.json?limit=100" -o Packages/F1Core/Sources/F1Core/Resources/SampleData/season.json
 curl -s "https://api.jolpi.ca/ergast/f1/current/last/results.json" -o Packages/F1Core/Tests/F1CoreTests/Fixtures/results.json
 ```
 

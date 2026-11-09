@@ -8,7 +8,7 @@ private func fixture(_ name: String) throws -> Data {
 }
 
 private func loadSchedule() throws -> [RaceWeekend] {
-    try JolpicaClient.decodeSchedule(fixture("season"))
+    try JolpicaClient.decodeSchedule(SampleData.seasonJSON)
 }
 
 @Suite struct ScheduleDecodingTests {

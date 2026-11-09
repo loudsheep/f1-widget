@@ -54,7 +54,7 @@ struct NextRaceProvider: AppIntentTimelineProvider {
         return Timeline(entries: entries, policy: .after(dates.last ?? end))
     }
 
-    private static func entry(at date: Date, schedule: [RaceWeekend], configuration: NextRaceIntent) -> NextRaceEntry {
+    static func entry(at date: Date, schedule: [RaceWeekend], configuration: NextRaceIntent) -> NextRaceEntry {
         let next = schedule.nextSession(at: date)
         return NextRaceEntry(
             date: date,

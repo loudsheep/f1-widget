@@ -13,6 +13,7 @@ let package = Package(
             resources: [
                 .copy("Resources/CircuitMaps"),
                 .copy("Resources/Flags"),
+                .copy("Resources/SampleData"),
             ]
         ),
         .testTarget(

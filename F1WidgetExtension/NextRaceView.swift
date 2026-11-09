@@ -9,16 +9,19 @@ struct NextRaceView: View {
     var body: some View {
         if let weekend = entry.weekend, let session = entry.session {
             let content = WidgetContent(weekend: weekend, session: session, now: entry.date)
-            switch family {
-            case .systemSmall:
-                if entry.style == .track, CircuitMap.url(for: weekend.circuit.id) != nil {
-                    SmallTrackView(content: content)
-                } else {
-                    SmallFlagView(content: content)
+            Group {
+                switch family {
+                case .systemSmall:
+                    if entry.style == .track, CircuitMap.url(for: weekend.circuit.id) != nil {
+                        SmallTrackView(content: content)
+                    } else {
+                        SmallFlagView(content: content)
+                    }
+                default:
+                    MediumView(content: content)
                 }
-            default:
-                MediumView(content: content)
             }
+            .fontDesign(.monospaced)
         } else {
             ContentUnavailableView("No upcoming race", systemImage: "flag.checkered")
         }
@@ -133,12 +136,13 @@ private struct MediumView: View {
             .frame(maxWidth: .infinity, alignment: .leading)
 
             VStack(alignment: .leading, spacing: 3) {
-                HStack(spacing: 6) {
+                HStack(alignment: .top, spacing: 6) {
                     FlagView(country: content.weekend.circuit.country, width: 22)
                     Text(content.weekend.name)
                         .font(.caption.bold())
                         .foregroundStyle(.white)
-                        .lineLimit(1)
+                        .lineLimit(2)
+                        .minimumScaleFactor(0.8)
                     Spacer(minLength: 0)
                     RoundLabel(round: content.weekend.round)
                 }

@@ -43,6 +43,13 @@ public struct RGB: Hashable, Sendable {
         )
     }
 
+    public func vivid() -> RGB {
+        let brightest = max(red, green, blue)
+        guard brightest > 0 else { return self }
+        let scale = 1 / brightest
+        return RGB(red: red * scale, green: green * scale, blue: blue * scale)
+    }
+
     public func lightened(toContrast target: Double, against background: RGB = .black) -> RGB {
         var amount = 0.0
         var color = self
@@ -55,7 +62,7 @@ public struct RGB: Hashable, Sendable {
 }
 
 public struct CountryTheme: Sendable {
-    public static let minimumTextContrast = 4.5
+    public static let minimumTextContrast = 7.0
     public static let fallback = CountryTheme(colors: [RGB(hex: 0xE10600)])
 
     public let colors: [RGB]
@@ -64,7 +71,7 @@ public struct CountryTheme: Sendable {
     public var glowSecondary: RGB { colors.count > 1 ? colors[1] : colors[0] }
 
     public var accent: RGB {
-        glowPrimary.lightened(toContrast: Self.minimumTextContrast)
+        glowPrimary.vivid().lightened(toContrast: Self.minimumTextContrast)
     }
 
     public static func theme(for country: String) -> CountryTheme {

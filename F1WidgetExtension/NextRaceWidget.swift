@@ -26,16 +26,16 @@ struct WidgetBackground: View {
         ZStack {
             Color.black
             RadialGradient(
-                colors: [theme.glowPrimary.color.opacity(0.55), .clear],
+                colors: [theme.glowPrimary.color.opacity(0.75), .clear],
                 center: .topLeading,
                 startRadius: 0,
-                endRadius: 240
+                endRadius: 260
             )
             RadialGradient(
-                colors: [theme.glowSecondary.color.opacity(0.4), .clear],
+                colors: [theme.glowSecondary.color.opacity(0.55), .clear],
                 center: .bottomTrailing,
                 startRadius: 0,
-                endRadius: 240
+                endRadius: 260
             )
         }
     }
